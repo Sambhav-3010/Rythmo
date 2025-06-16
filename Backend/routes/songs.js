@@ -1,35 +1,32 @@
 const express = require('express');
 const router = express.Router();
-const multer = require('multer');
+const upload = require('../utils/multer');
 const cloudinary = require('../utils/cloudinary');
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const Song = require('../models/Song');
-const verifySession = require('../middleware/session');
+const authMiddleware = require('../middleware/authMiddleware');
+const isArtist = require('../middleware/isArtist');
 
-const storage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: 'spotify_clone_songs',
-    resource_type: 'video',
-    format: async (req, file) => 'mp3',
-  }
-});
-
-const upload = multer({ storage });
-
-router.post('/upload', verifySession, upload.single('song'), async (req, res) => {
+router.post('/upload', authMiddleware, isArtist, upload.single('file'), async (req, res) => {
   try {
-    const { title, genre } = req.body;
-    const song = new Song({
-      title,
-      genre,
-      artist: req.user.id,
-      url: req.file.path
+    const fileBuffer = req.file.buffer.toString('base64');
+    const uploadResult = await cloudinary.uploader.upload(`data:audio/mpeg;base64,${fileBuffer}`, {
+      resource_type: 'video',
+      folder: 'spotify_songs',
+      public_id: `${req.user.name}_${Date.now()}`,
     });
+
+    const song = new Song({
+      title: req.body.title,
+      artistId: req.user._id,
+      cloudinaryUrl: uploadResult.secure_url,
+    });
+
     await song.save();
-    res.status(201).json({ message: 'Song uploaded', song });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+
+    res.status(200).json({ message: 'Song uploaded', song });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Upload failed' });
   }
 });
 

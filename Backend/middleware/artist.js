@@ -1,5 +1,3 @@
-const User = require('../models/User');
-
 const verifyArtist = (req, res, next) => {
   if (req.user && req.user.userType === 'artist') {
     return next();
