@@ -6,9 +6,12 @@ const cors = require('cors');
 const authRoutes = require('./routes/auth');
 require('./config/passport');
 const session = require('express-session');
+const songRoutes = require('./routes/songs');
+const cookieParser = require('cookie-parser');
 
-// MongoDB Connection and app creation
+
 const app = express();
+app.use(cookieParser());
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -26,17 +29,8 @@ app.get('/', (req, res) => {
   res.send('Welcome to the Rythmo\'s API');
 });
 
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'default_secret',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    httpOnly: true,
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  }
-}));
 app.use('/authentication', authRoutes);
+app.use('/songs', songRoutes);
 
-// Start Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

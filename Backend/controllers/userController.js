@@ -1,16 +1,34 @@
 const User = require('../models/User');
+const Session = require('../models/Session');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+
+const cookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'strict',
+  maxAge: 30 * 24 * 60 * 60 * 1000
+};
 
 exports.signup = async (req, res) => {
   try {
     const { email, password, name, userType } = req.body;
-    const user = new User({ email, password, name, userType });
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = new User({ email, password: hashedPassword, name, userType });
     await user.save();
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
-    req.session.token = token;
+    const token = jwt.sign({ userId: user._id, type: user.userType }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
+    await Session.create({
+      userId: user._id,
+      name: user.name,
+      email: user.email,
+      type: user.userType,
+      token
+    });
+
+    res.cookie('token', token, cookieOptions);
     res.json({ user: { email, name, userType } });
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -20,15 +38,24 @@ exports.signup = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
+
     const user = await User.findOne({ email });
     if (!user) throw new Error('User not found');
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) throw new Error('Invalid credentials');
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
-    req.session.token = token;
+    const token = jwt.sign({ userId: user._id, type: user.userType }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
+    await Session.create({
+      userId: user._id,
+      name: user.name,
+      email: user.email,
+      type: user.userType,
+      token
+    });
+
+    res.cookie('token', token, cookieOptions);
     res.json({ user: { email: user.email, name: user.name, userType: user.userType } });
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -36,7 +63,7 @@ exports.login = async (req, res) => {
 };
 
 exports.googleCallback = (req, res) => {
-  const token = jwt.sign({ userId: req.user._id }, process.env.JWT_SECRET);
-  req.session.token = token;
+  const token = jwt.sign({ userId: req.user._id, type: req.user.userType }, process.env.JWT_SECRET, { expiresIn: '7d' });
+  res.cookie('token', token, cookieOptions);
   res.redirect(`${process.env.CLIENT_URL}/login-success`);
 };
