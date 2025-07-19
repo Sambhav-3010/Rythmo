@@ -139,7 +139,7 @@
 }
 
 .glass-button:hover {
-  background: rgba(145, 137, 155, 0.1);
+  background: rgba(187, 134, 252, 0.1);
   border-color: rgba(187, 134, 252, 0.5);
   transform: translateY(-2px);
   box-shadow: 0 10px 25px rgba(187, 134, 252, 0.2);
@@ -168,6 +168,29 @@
   100% {
     transform: translateY(-100px) rotate(360deg);
     opacity: 0;
+  }
+}
+
+@keyframes rise {
+  0% {
+    transform: translate3d(var(--x), var(--y-start), 0) scale(0.8);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate3d(var(--x), -110vh, 0) scale(1.2);
+    opacity: 0;
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(20px) translateX(-10px) scale(1);
+  }
+  50% {
+    transform: translateY(-30px) translateX(20px) scale(1.1);
+  }
+  100% {
+    transform: translateY(20px) translateX(-10px) scale(1);
   }
 }
 

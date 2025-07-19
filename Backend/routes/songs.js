@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const upload = require('../utils/multer');
-const cloudinary = require('../utils/cloudinary');
+const upload = require('../config/multer');
+const cloudinary = require('../config/cloudinary');
 const Song = require('../models/Song');
-const authMiddleware = require('../middleware/authMiddleware');
+const authMiddleware = require('../middleware/isAuthenticated');
 const isArtist = require('../middleware/isArtist');
 
 router.post('/upload', authMiddleware, isArtist, upload.single('file'), async (req, res) => {

@@ -29,7 +29,7 @@ app.get('/', (req, res) => {
   res.send('Welcome to the Rythmo\'s API');
 });
 
-app.use('/authentication', authRoutes);
+app.use('/auth', authRoutes);
 app.use('/songs', songRoutes);
 
 const PORT = process.env.PORT || 5000;

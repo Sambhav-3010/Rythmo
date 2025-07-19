@@ -56,7 +56,7 @@ exports.login = async (req, res) => {
     });
 
     res.cookie('token', token, cookieOptions);
-    res.json({ user: { email: user.email, name: user.name, userType: user.userType } });
+    res.status(200).json({status : 'success', user: { email: user.email, name: user.name, userType: user.userType } });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
