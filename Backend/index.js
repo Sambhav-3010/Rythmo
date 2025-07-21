@@ -6,9 +6,14 @@ const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const authRoutes = require('./routes/auth');
-const songRoutes = require('./routes/songUpload');
+const songUpload = require('./routes/songUpload');
 const album = require('./routes/album');
 const playlistRoutes = require('./routes/playlist');
+const analyticsRoutes = require('./routes/analytics');
+const isArtist = require('./middleware/isArtist');
+const songs = require('./routes/songs');
+const artistRoutes = require('./routes/artistAnalytics');
+
 
 // Mongoose connection and middleware setup
 const app = express();
@@ -28,9 +33,12 @@ app.get('/', (req, res) => {
 
 // Routers are setup here
 app.use('/auth', authRoutes);
-app.use('/songs', songRoutes);
+app.use('/songsUpload', songUpload);
+app.use('/songs', songs);
 app.use('/album', album);
 app.use('/playlist', playlistRoutes);
+app.use('/analytics', isArtist, analyticsRoutes);
+app.use('/artist', artistRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -12,10 +12,10 @@ const cookieOptions = {
 
 exports.signup = async (req, res) => {
   try {
-    const { email, password, name, userType } = req.body;
+    const { email, password, name, userType , likedSongs} = req.body;
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ email, password: hashedPassword, name, userType: userType.toLowerCase() });
+    const user = new User({ email, password: hashedPassword, name, userType: userType.toLowerCase(), likedSongs });
     await user.save();
 
     const token = jwt.sign({ userId: user._id, type: user.userType }, process.env.JWT_SECRET, { expiresIn: '7d' });

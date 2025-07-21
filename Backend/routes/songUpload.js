@@ -1,54 +1,35 @@
 const express = require('express');
 const router = express.Router();
-const upload = require('../config/multer');
+const upload = require('../config/multer').single('file');
 const cloudinary = require('../config/cloudinary');
 const Song = require('../models/song');
 const authMiddleware = require('../middleware/isAuthenticated');
 const isArtist = require('../middleware/isArtist');
+const { round } = require('mathjs');
 
-const multerMiddleware = upload.fields([
-  { name: 'file', maxCount: 1 },
-  { name: 'cover', maxCount: 1 },
-]);
-
-router.post('/upload', authMiddleware, isArtist, multerMiddleware, async (req, res) => {
+router.post('/upload', authMiddleware, isArtist, upload, async (req, res) => {
   try {
-    const audioFile = req.files['file'][0];
-    const coverFile = req.files['cover'][0];
-
-    const audioBuffer = audioFile.buffer.toString('base64');
-    const audioUpload = await cloudinary.uploader.upload(
-      `data:audio/mpeg;base64,${audioBuffer}`,
-      {
-        resource_type: 'video',
-        folder: 'spotify_songs',
-        public_id: `${req.user.name}_${Date.now()}_song`,
-      }
-    );
-
-    const coverBuffer = coverFile.buffer.toString('base64');
-    const coverUpload = await cloudinary.uploader.upload(
-      `data:image/jpeg;base64,${coverBuffer}`,
-      {
-        resource_type: 'image',
-        folder: 'spotify_covers',
-        public_id: `${req.user.name}_${Date.now()}_cover`,
-      }
-    );
-
+    if (!req.file) {
+      return res.status(400).json({ error: 'Song file is required.' });
+    }
+    const audioFile = req.file;
+    const audioDataUri = `data:${audioFile.mimetype};base64,${audioFile.buffer.toString('base64')}`;
+    const audioUpload = await cloudinary.uploader.upload(audioDataUri, {
+      resource_type: 'video',
+      folder: 'spotify_songs',
+      public_id: `${req.user.name}_${Date.now()}_song`,
+    });
     const song = new Song({
       title: req.body.title,
       artistId: req.user._id,
       cloudinaryUrl: audioUpload.secure_url,
-      coverImageUrl: coverUpload.secure_url,
+      duration: round(audioUpload.duration),
     });
-
     await song.save();
-
-    res.status(200).json({ message: 'Song and cover uploaded', song });
+    res.status(200).json({ message: 'Song uploaded successfully', song });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Upload failed' });
+    console.error("Upload failed:", error);
+    res.status(500).json({ error: 'An unexpected error occurred during the upload.' });
   }
 });
 

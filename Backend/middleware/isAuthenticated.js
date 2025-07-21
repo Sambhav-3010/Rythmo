@@ -3,15 +3,15 @@ const User = require("../models/user");
 const verifySession = async (req, res, next) => {
   req.user = {
     _id: "687c242fb8aa74776315e4b6",
-    email: "sam@gmail.com",
+    email: "listener@gmail.com",
     password: "123",
-    name: "Sambhav",
+    name: "DeadShot_3010",
     likedSongs: [],
-    userType: "artist",
+    userType: "listener",
   };
   req.session = {
     token:
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODdjMjQyZmI4YWE3NDc3NjMxNWU0YjYiLCJ0eXBlIjoiYXJ0aXN0IiwiaWF0IjoxNzUyOTY2ODA5LCJleHAiOjE3NTM1NzE2MDl9.XMnlIM5Gzx53C1hPCUjDlfkoWAzWNcRAMYTZBdqW8d0",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODdlN2RiZTJjMGIwNTJjZGQzZTBlZGUiLCJ0eXBlIjoibGlzdGVuZXIiLCJpYXQiOjE3NTMxMjAyNjAsImV4cCI6MTc1MzcyNTA2MH0.uvvsPC5FWFXUk3t8dat3XAX4N_WDSqC5Xay0-uVhsWE",
   };
   try {
     const token = req.session.token;
