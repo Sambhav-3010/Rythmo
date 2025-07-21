@@ -13,6 +13,7 @@ const analyticsRoutes = require('./routes/analytics');
 const isArtist = require('./middleware/isArtist');
 const songs = require('./routes/songs');
 const artistRoutes = require('./routes/artistAnalytics');
+const savedSongRoutes = require('./routes/savedSong');
 
 
 // Mongoose connection and middleware setup
@@ -39,6 +40,7 @@ app.use('/album', album);
 app.use('/playlist', playlistRoutes);
 app.use('/analytics', isArtist, analyticsRoutes);
 app.use('/artist', artistRoutes);
+app.use('/savedSongs', savedSongRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
