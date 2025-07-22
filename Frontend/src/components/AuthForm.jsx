@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useContext, useState } from "react"
 import { IoEye, IoEyeOff, IoHeadset, IoMail, IoLockClosed, IoPerson, IoMic } from "react-icons/io5"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -7,45 +7,44 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import api from "@/lib/api" 
+import { useNavigate } from 'react-router-dom';
+import { AuthContext } from "@/context/AuthContext";
 
 export function AuthForm() {
+  const navigate = useNavigate()
+  const { login } = useContext(AuthContext);
   const [authForm, setAuthForm] = useState({
     loginEmail: "",
     loginPassword: "",
     signupName: "",
     signupEmail: "",
     signupPassword: "",
-    userType: "listener"
+    userType: ""
   })
 
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
-
+  
   const handleChange = (field) => (e) => {
     setAuthForm((prev) => ({ ...prev, [field]: e.target.value }))
   }
-
+  
   const handleLogin = async () => {
     try {
       setLoading(true)
-      const { data } = await api.post("/auth/login", {
-        methods: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        credentials: "include",
-        body: {
+      const { data } = await api.post(`${import.meta.env.VITE_BACKEND_URL}/auth/login`, 
+        {
           email: authForm.loginEmail,
           password: authForm.loginPassword
-        }
-      })
-      const dataResponse = await response.json();
-      if (dataResponse.ok) {
-        navigate("/");
+        },
+        { withCredentials: true }
+      )
+      if (data.status === "success") {
+        await login();
+        navigate("/" , { replace: true });
       } else {
-        alert(dataResponse.message || "Login failed");
+        alert(data.error || "Login failed");
       }
-      console.log("Login successful:", dataResponse)
     } catch (err) {
       console.error("Login error:", err.response?.data || err.message)
     } finally {
@@ -56,25 +55,20 @@ export function AuthForm() {
   const handleSignup = async () => {
     try {
       setLoading(true)
-      const { data } = await api.post("/auth/signup", {
-        headers: {
-          "Content-Type": "application/json"
-        },
-        credentials: "include",
-        body: {
+      const { data } = await api.post(`${import.meta.env.VITE_BACKEND_URL}/auth/signup`, {
           email: authForm.signupEmail,
           password: authForm.signupPassword,
-          name: authForm.signupName,
-          role: authForm.userType
+          userType: authForm.userType,
+          name: authForm.signupName
         },
-      })
-      const dataResponse = await response.json();
-      if (dataResponse.ok) {
-        navigate("/");
+        { withCredentials: true }
+      )
+      if (data.status === "success") {
+        await login();
+        navigate("/" , { replace: true });
       } else {
-        alert(dataResponse.message || "Signup failed");
+        alert(data.message || "Signup failed");
       }
-      console.log("Signup successful:", dataResponse)
     } catch (err) {
       console.error("Signup error:", err.response?.data || err.message)
     } finally {

@@ -8,6 +8,9 @@ import Auth from "./pages/Auth"
 import Search from "./pages/Search"
 import Library from "./pages/Library"
 import ArtistDashboard from "./pages/ArtistDashboard"
+import { useContext } from "react"
+import { AuthContext } from './context/authContext';
+import ErrorPage from "./pages/NotFound"
 
 const router = createBrowserRouter([
   { path: "/", element: <Home /> },
@@ -18,9 +21,12 @@ const router = createBrowserRouter([
   { path: "/search", element: <Search /> },
   { path: "/library", element: <Library /> },
   { path: "/artist-dashboard", element: <ArtistDashboard /> },
+  { path: "/error", element: <ErrorPage /> },
+  { path: "*", element: <ErrorPage /> }
 ])
 
 function App() {
+  const { user, login, logout } = useContext(AuthContext);
   return (
     <div className="bg-black text-white antialiased min-h-screen">
       <PlayerProvider>
