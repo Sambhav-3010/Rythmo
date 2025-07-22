@@ -29,7 +29,7 @@ exports.signup = async (req, res) => {
     });
 
     res.cookie('token', token, cookieOptions);
-    res.json({ message: "Signup successful", token});
+    res.status(200).json({status : 'success', data: { email: user.email, name: user.name, userType: user.userType, cookie: token } });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -38,7 +38,6 @@ exports.signup = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-
     const user = await User.findOne({ email });
     if (!user) throw new Error('User not found');
 
