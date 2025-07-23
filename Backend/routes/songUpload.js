@@ -21,11 +21,12 @@ router.post('/upload', authMiddleware, isArtist, upload, async (req, res) => {
     });
     const song = new Song({
       title: req.body.title,
-      artistId: req.user._id,
+      artistId: req.body.user,
       cloudinaryUrl: audioUpload.secure_url,
       duration: round(audioUpload.duration),
     });
     await song.save();
+    console.log("Song uploaded successfully:", song);
     res.status(200).json({ message: 'Song uploaded successfully', song });
   } catch (error) {
     console.error("Upload failed:", error);

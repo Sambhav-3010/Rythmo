@@ -15,8 +15,8 @@ router.get('/auth/google/callback',
   userController.googleCallback);
 
 router.get('/me', verifySession, (req, res) => {
-  const { email, name, userType } = req.user;
-  res.json({ email, name, userType });
+  const { email, name, userType, _id } = req.user;
+  res.json({ email, name, userType, _id });
 });
 
 router.post("/logout", (req, res) => {
