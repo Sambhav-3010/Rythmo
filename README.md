@@ -1,4 +1,4 @@
-# Rythmo - Your Music Universe
+# Rythmo - Your Music Universe (Ongoing)
 - Rythmo is a full-featured music streaming web application designed to deliver an immersive and personalized audio experience for both Listeners and Artists. Built with the MERN stack (MongoDB, Express.js, React, Node.js), 
 - Rythmo aims to replicate and enhance the core functionality of platforms like Spotify, with a modern interface and a powerful backend.
 
