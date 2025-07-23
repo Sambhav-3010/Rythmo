@@ -16,8 +16,8 @@ export const AuthProvider = ({ children }) => {
         }
       );
       if (response.ok) {
-        const { email, name, userType } = await response.json();
-        return { email, name, userType };
+        const { email, name, userType, _id } = await response.json();
+        return { email, name, userType, _id };
       } else {
         const errText = await response.text();
         return null;
